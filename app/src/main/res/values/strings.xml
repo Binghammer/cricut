@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Cricut Quiz</string>
+    <string name="all_true">True</string>
+    <string name="all_false">False</string>
+    <string name="all_previous">Previous</string>
+    <string name="all_next">Next</string>
+</resources>
