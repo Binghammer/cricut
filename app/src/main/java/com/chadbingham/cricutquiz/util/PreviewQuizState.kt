@@ -11,8 +11,11 @@ import com.chadbingham.cricutquiz.ui.viewmodel.QuizState
 
 object PreviewQuizState {
 
-    fun getQuizState(): QuizState {
-        return QuizState(getQuestions())
+    fun getQuizState(currentIndex: Int = 0): QuizState {
+        return QuizState(
+            questions = getQuestions(),
+            currentIndex = currentIndex,
+        )
     }
 
     private fun getQuestions(): List<Question> {
@@ -47,6 +50,7 @@ object PreviewQuizState {
     fun getUserInputQuestion(): Question.TextInput {
         return Question.TextInput(
             question = "What is the name of your pet?",
+            hint = "Name",
         )
     }
 }

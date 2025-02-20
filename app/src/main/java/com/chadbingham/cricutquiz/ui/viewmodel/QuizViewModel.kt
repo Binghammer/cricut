@@ -9,8 +9,8 @@
 package com.chadbingham.cricutquiz.ui.viewmodel
 
 import android.app.Application
-import android.net.http.SslCertificate.saveState
 import android.os.Parcelable
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
@@ -24,7 +24,7 @@ import kotlinx.parcelize.Parcelize
 
 class QuizViewModel(
     application: Application,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
 ) : AndroidViewModel(application) {
 
     //normally injected
@@ -38,12 +38,17 @@ class QuizViewModel(
     private var state: QuizState
         get() = _quizState.value
         set(value) {
-            _quizState.value = value
+            //need to reset nextEnabled
+            _quizState.value = value.copy(nextEnabled = value.getAnswer<UserAnswer>().isValid)
             savedStateHandle["quizState"] = _quizState.value
         }
 
     private val currentIndex: Int
         get() = state.currentIndex
+
+    fun startOver() {
+        state = QuizState(fakeRepo.getQuestions())
+    }
 
     fun submitAnswer(answer: UserAnswer) {
         val updatedAnswers = state.userAnswers.toMutableMap().apply { this[currentIndex] = answer }
@@ -52,10 +57,11 @@ class QuizViewModel(
             userAnswers = updatedAnswers,
             nextEnabled = answer.isValid
         )
+        Log.d("***", "Is valid: ${answer.isValid}")
     }
 
     fun nextQuestion() {
-        if (state.nextEnabled) {
+        if (state.nextEnabled || state.getQuestion().type == QuestionType.TRUE_FALSE) {
             state = if (currentIndex < state.questions.size - 1) {
                 state.copy(currentIndex = currentIndex + 1)
             } else {
@@ -65,12 +71,8 @@ class QuizViewModel(
     }
 
     fun previousQuestion() {
-        state = if (currentIndex > 0) {
-            state.copy(currentIndex = currentIndex - 1)
-        } else if (currentIndex == state.questions.size && state.showSummary) {
-            state.copy(showSummary = false)
-        } else {
-            state //shouldn't happen
+        if (currentIndex > 0) {
+            state = state.copy(currentIndex = currentIndex - 1)
         }
     }
 }
@@ -84,13 +86,15 @@ data class QuizState(
     val showSummary: Boolean = false,
 ) : Parcelable {
 
+    fun getQuestion(): Question = questions[currentIndex]
+
     /**
      * This will return an answer even if there is currently not answer
      * available. It WILL NOT set a default answer if the UserAnswer is
      * missing from userAnswers
      */
     @Suppress("UNCHECKED_CAST")
-    fun<T: UserAnswer> getAnswer(): T {
+    fun <T : UserAnswer> getAnswer(): T {
         return userAnswers.getOrDefault(currentIndex, defaultAnswer()) as T
     }
 

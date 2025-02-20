@@ -4,4 +4,8 @@
     <string name="all_false">False</string>
     <string name="all_previous">Previous</string>
     <string name="all_next">Next</string>
+    <string name="all_submit">Submit</string>
+    <string name="congrats">Congragulations!</string>
+    <string name="you_completed_the_quiz">You completed the quiz</string>
+    <string name="start_over">Start Over</string>
 </resources>

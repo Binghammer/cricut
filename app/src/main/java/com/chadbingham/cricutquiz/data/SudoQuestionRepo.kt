@@ -32,6 +32,7 @@ class SudoQuestionRepo(private val context: Context) {
 
             Question.TextInput(
                 question = "What is the name of your pet?",
+                hint = "Name"
             )
         )
     }
