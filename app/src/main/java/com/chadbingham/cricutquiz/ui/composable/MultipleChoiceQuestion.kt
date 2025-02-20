@@ -8,6 +8,7 @@ package com.chadbingham.cricutquiz.ui.composable
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
@@ -35,7 +36,7 @@ fun MultipleChoiceQuestion(
 
     var answer by rememberSaveable { mutableStateOf(userAnswer) }
 
-    Column(modifier = modifier) {
+    Column(modifier = modifier.fillMaxWidth(.5f)) {
         question.options.forEachIndexed { index, option ->
             Row(
                 verticalAlignment = Alignment.CenterVertically

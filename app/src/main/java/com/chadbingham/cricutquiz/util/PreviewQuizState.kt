@@ -7,14 +7,18 @@
 package com.chadbingham.cricutquiz.util
 
 import com.chadbingham.cricutquiz.data.Question
+import com.chadbingham.cricutquiz.data.UserAnswer
 import com.chadbingham.cricutquiz.ui.viewmodel.QuizState
 
 object PreviewQuizState {
 
     fun getQuizState(currentIndex: Int = 0): QuizState {
+        val questionsAndAnswers = linkedMapOf<Question, UserAnswer>()
+        getQuestions().forEach {
+            questionsAndAnswers[it] = it.defaultAnswer()
+        }
         return QuizState(
-            questions = getQuestions(),
-            currentIndex = currentIndex,
+            questionsAndAnswers = questionsAndAnswers, currentIndex = currentIndex
         )
     }
 

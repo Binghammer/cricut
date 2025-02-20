@@ -23,7 +23,6 @@ sealed class Question : Parcelable {
     @Parcelize
     data class TrueFalse(
         override val question: String,
-        val answer: UserAnswer = UserAnswer.TrueFalse(),
     ) : Question() {
         @IgnoredOnParcel
         override val type: QuestionType = TRUE_FALSE
@@ -33,7 +32,6 @@ sealed class Question : Parcelable {
     data class SingleChoice(
         override val question: String,
         val options: List<String>,
-        val answer: UserAnswer = UserAnswer.SingleChoice(),
     ) : Question() {
         @IgnoredOnParcel
         override val type: QuestionType = SINGLE_CHOICE
@@ -43,7 +41,6 @@ sealed class Question : Parcelable {
     data class MultipleChoice(
         override val question: String,
         val options: List<String>,
-        val answer: UserAnswer = UserAnswer.MultipleChoice(),
     ) : Question() {
         @IgnoredOnParcel
         override val type: QuestionType = MULTI_CHOICE
@@ -52,10 +49,18 @@ sealed class Question : Parcelable {
     @Parcelize
     data class TextInput(
         override val question: String,
-        val answer: UserAnswer = UserAnswer.TextInput(),
         val hint: String = "",
     ) : Question() {
         @IgnoredOnParcel
         override val type: QuestionType = TEXT_INPUT
+    }
+
+    fun defaultAnswer(): UserAnswer {
+        return when (type) {
+            TRUE_FALSE -> UserAnswer.TrueFalse()
+            SINGLE_CHOICE -> UserAnswer.SingleChoice()
+            MULTI_CHOICE -> UserAnswer.MultipleChoice()
+            TEXT_INPUT -> UserAnswer.TextInput()
+        }
     }
 }

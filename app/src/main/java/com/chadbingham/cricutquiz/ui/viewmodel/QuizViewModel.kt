@@ -10,7 +10,6 @@ package com.chadbingham.cricutquiz.ui.viewmodel
 
 import android.app.Application
 import android.os.Parcelable
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
@@ -31,62 +30,66 @@ class QuizViewModel(
     private val fakeRepo: SudoQuestionRepo = SudoQuestionRepo(application)
 
     private val _quizState = MutableStateFlow(
-        savedStateHandle.get<QuizState>("quizState") ?: QuizState(fakeRepo.getQuestions())
+        savedStateHandle.get<QuizState>("quizState") ?: createNewQuizState()
     )
     val quizState: StateFlow<QuizState> = _quizState
 
     private var state: QuizState
         get() = _quizState.value
         set(value) {
-            //need to reset nextEnabled
-            _quizState.value = value.copy(nextEnabled = value.getAnswer<UserAnswer>().isValid)
+            _quizState.value = if (value.currentIndex != value.questionsAndAnswers.size) {
+                //need to reset nextEnabled
+                value.copy(nextEnabled = value.getCurrentAnswer<UserAnswer>().isValid)
+            } else {
+                value
+            }
+
             savedStateHandle["quizState"] = _quizState.value
         }
 
-    private val currentIndex: Int
-        get() = state.currentIndex
+    private fun createNewQuizState(): QuizState {
+        val questionsAndAnswers = linkedMapOf<Question, UserAnswer>()
+        fakeRepo.getQuestions().forEach {
+            questionsAndAnswers[it] = it.defaultAnswer()
+        }
+        return QuizState(questionsAndAnswers = questionsAndAnswers)
+    }
 
     fun startOver() {
-        state = QuizState(fakeRepo.getQuestions())
+        state = createNewQuizState()
     }
 
     fun submitAnswer(answer: UserAnswer) {
-        val updatedAnswers = state.userAnswers.toMutableMap().apply { this[currentIndex] = answer }
-
-        state = state.copy(
-            userAnswers = updatedAnswers,
-            nextEnabled = answer.isValid
-        )
-        Log.d("***", "Is valid: ${answer.isValid}")
+        val qAndA = state.questionsAndAnswers.toMutableMap()
+        qAndA[state.currentQuestion] = answer
+        state = state.copy(questionsAndAnswers = qAndA, nextEnabled = answer.isValid)
     }
 
     fun nextQuestion() {
-        if (state.nextEnabled || state.getQuestion().type == QuestionType.TRUE_FALSE) {
-            state = if (currentIndex < state.questions.size - 1) {
-                state.copy(currentIndex = currentIndex + 1)
-            } else {
-                state.copy(showSummary = true)
-            }
+        if (state.nextEnabled || state.currentQuestion.type == QuestionType.TRUE_FALSE) {
+            state = state.copy(currentIndex = state.currentIndex + 1)
         }
     }
 
     fun previousQuestion() {
-        if (currentIndex > 0) {
-            state = state.copy(currentIndex = currentIndex - 1)
+        if (state.currentIndex > 0) {
+            state = state.copy(currentIndex = state.currentIndex - 1)
         }
     }
 }
 
 @Parcelize
 data class QuizState(
-    val questions: List<Question> = emptyList(),
-    val userAnswers: Map<Int, UserAnswer> = emptyMap(),
+    val questionsAndAnswers: Map<Question, UserAnswer>,
     val currentIndex: Int = 0,
     val nextEnabled: Boolean = false,
-    val showSummary: Boolean = false,
 ) : Parcelable {
 
-    fun getQuestion(): Question = questions[currentIndex]
+    private val currentQuestionAndAnswer: Pair<Question, UserAnswer>
+        get() = getQuestionAndAnswer(currentIndex)
+
+    val currentQuestion: Question
+        get() = currentQuestionAndAnswer.first
 
     /**
      * This will return an answer even if there is currently not answer
@@ -94,16 +97,16 @@ data class QuizState(
      * missing from userAnswers
      */
     @Suppress("UNCHECKED_CAST")
-    fun <T : UserAnswer> getAnswer(): T {
-        return userAnswers.getOrDefault(currentIndex, defaultAnswer()) as T
+    fun <T : UserAnswer> getCurrentAnswer(): T {
+        return currentQuestionAndAnswer.second as T
     }
 
-    private fun defaultAnswer(): UserAnswer {
-        return when (questions[currentIndex].type) {
-            QuestionType.TRUE_FALSE -> UserAnswer.TrueFalse()
-            QuestionType.SINGLE_CHOICE -> UserAnswer.SingleChoice()
-            QuestionType.MULTI_CHOICE -> UserAnswer.MultipleChoice()
-            QuestionType.TEXT_INPUT -> UserAnswer.TextInput()
+    fun getQuestionAndAnswer(index: Int): Pair<Question, UserAnswer> {
+        if (index < 0 || index >= questionsAndAnswers.size) {
+            error("Not found")
+        }
+        return questionsAndAnswers.entries.elementAt(index).let { entry ->
+            entry.key to entry.value
         }
     }
 }

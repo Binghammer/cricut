@@ -18,7 +18,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.chadbingham.cricutquiz.ui.screen.QuizScreen
-import com.chadbingham.cricutquiz.ui.screen.SummaryScreen
 import com.chadbingham.cricutquiz.ui.theme.CricutQuizTheme
 import com.chadbingham.cricutquiz.ui.viewmodel.QuizViewModel
 
@@ -33,20 +32,14 @@ class MainActivity : ComponentActivity() {
             val quizState by viewModel.quizState.collectAsState()
             CricutQuizTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    if (quizState.showSummary) {
-                        SummaryScreen(modifier = Modifier.padding(innerPadding)) {
-                            viewModel.startOver()
-                        }
-
-                    } else {
-                        QuizScreen(
-                            modifier = Modifier.padding(innerPadding),
-                            quizState = quizState,
-                            viewModel::nextQuestion,
-                            viewModel::previousQuestion,
-                            viewModel::submitAnswer
-                        )
-                    }
+                    QuizScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        quizState = quizState,
+                        viewModel::nextQuestion,
+                        viewModel::previousQuestion,
+                        viewModel::submitAnswer,
+                        viewModel::startOver
+                    )
                 }
             }
         }
