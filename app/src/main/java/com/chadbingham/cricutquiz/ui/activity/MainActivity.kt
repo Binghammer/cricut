@@ -22,11 +22,11 @@ import com.chadbingham.cricutquiz.ui.theme.CricutQuizTheme
 import com.chadbingham.cricutquiz.ui.viewmodel.QuizViewModel
 
 class MainActivity : ComponentActivity() {
+    val viewModel: QuizViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val viewModel: QuizViewModel by viewModels()
 
         setContent {
             val quizState by viewModel.quizState.collectAsState()

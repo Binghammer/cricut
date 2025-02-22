@@ -1,11 +1,5 @@
-/*
- * Created by bingham
- * Copyright (c) 2025. All rights reserved.
- * May this code run smoothly and may the bugs be someone else’s problem.
- */
-
-package com.chadbingham.cricutquiz.ui.composable
-
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,10 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,36 +20,40 @@ import com.chadbingham.cricutquiz.util.PreviewQuizState
 fun MultipleChoiceQuestion(
     modifier: Modifier = Modifier,
     question: Question.MultipleChoice,
-    userAnswer: UserAnswer.MultipleChoice,
+    answer: UserAnswer.MultipleChoice,
     onAnswerSelected: (UserAnswer) -> Unit,
 ) {
 
-    var answer by rememberSaveable { mutableStateOf(userAnswer) }
-
-    Column(modifier = modifier.fillMaxWidth(.5f)) {
+    Column(
+        modifier = modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         question.options.forEachIndexed { index, option ->
             Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Checkbox(
-                    checked = answer.indices.contains(index),
-
-                    onCheckedChange = { checked ->
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        val checked = !answer.indices.contains(index)
                         val indices = answer.indices.toMutableSet()
                         if (checked) {
                             indices.add(index)
                         } else {
                             indices.remove(index)
                         }
-                        answer = UserAnswer.MultipleChoice(indices)
-
-                        onAnswerSelected(answer)
+                        onAnswerSelected(UserAnswer.MultipleChoice(indices))
                     }
+                    .padding(8.dp),
+            ) {
+                Checkbox(
+                    checked = answer.indices.contains(index),
+                    onCheckedChange = null
                 )
                 Text(text = option, modifier = Modifier.padding(start = 8.dp))
             }
         }
     }
+
 }
 
 @Preview(showBackground = true)
@@ -69,7 +63,7 @@ private fun PreviewMultiChoice() {
         MultipleChoiceQuestion(
             modifier = Modifier,
             question = PreviewQuizState.getMultiChoiceQuestion(),
-            userAnswer = UserAnswer.MultipleChoice()
+            answer = UserAnswer.MultipleChoice()
         ) {}
     }
 }

@@ -18,11 +18,11 @@ import kotlinx.parcelize.Parcelize
 sealed class Question : Parcelable {
 
     abstract val type: QuestionType
-    abstract val question: String
+    abstract val text: String
 
     @Parcelize
     data class TrueFalse(
-        override val question: String,
+        override val text: String,
     ) : Question() {
         @IgnoredOnParcel
         override val type: QuestionType = TRUE_FALSE
@@ -30,7 +30,7 @@ sealed class Question : Parcelable {
 
     @Parcelize
     data class SingleChoice(
-        override val question: String,
+        override val text: String,
         val options: List<String>,
     ) : Question() {
         @IgnoredOnParcel
@@ -39,7 +39,7 @@ sealed class Question : Parcelable {
 
     @Parcelize
     data class MultipleChoice(
-        override val question: String,
+        override val text: String,
         val options: List<String>,
     ) : Question() {
         @IgnoredOnParcel
@@ -48,7 +48,7 @@ sealed class Question : Parcelable {
 
     @Parcelize
     data class TextInput(
-        override val question: String,
+        override val text: String,
         val hint: String = "",
     ) : Question() {
         @IgnoredOnParcel

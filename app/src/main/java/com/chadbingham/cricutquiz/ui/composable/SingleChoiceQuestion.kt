@@ -9,16 +9,11 @@ package com.chadbingham.cricutquiz.ui.composable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,11 +27,9 @@ import com.chadbingham.cricutquiz.util.PreviewQuizState
 fun SingleChoiceQuestion(
     modifier: Modifier = Modifier,
     question: Question.SingleChoice,
-    userAnswer: UserAnswer.SingleChoice,
+    answer: UserAnswer.SingleChoice,
     onAnswerSelected: (UserAnswer) -> Unit,
 ) {
-
-    var answer by rememberSaveable { mutableStateOf(userAnswer) }
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -54,8 +47,7 @@ fun SingleChoiceQuestion(
                 RadioButton(
                     selected = answer.index == index,
                     onClick = {
-                        answer = UserAnswer.SingleChoice(index)
-                        onAnswerSelected(answer)
+                        onAnswerSelected(UserAnswer.SingleChoice(index))
                     }
                 )
                 Text(
@@ -76,7 +68,7 @@ private fun PreviewSingle() {
         SingleChoiceQuestion(
             modifier = Modifier,
             question = PreviewQuizState.getSingleChoiceQuestion(),
-            userAnswer = UserAnswer.SingleChoice()
+            answer = UserAnswer.SingleChoice()
         ) { }
     }
 }

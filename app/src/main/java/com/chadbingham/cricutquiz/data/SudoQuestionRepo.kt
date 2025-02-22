@@ -7,7 +7,7 @@
 package com.chadbingham.cricutquiz.data
 
 import android.content.Context
-import androidx.annotation.StringRes
+import com.chadbingham.cricutquiz.R
 
 /**
  * Fake repo to return awesome questions
@@ -17,27 +17,23 @@ class SudoQuestionRepo(private val context: Context) {
     fun getQuestions(): List<Question> {
         return listOf(
             Question.TrueFalse(
-                question = "Is Kotlin awesome?",
+                text = context.getString(R.string.question_one)
             ),
 
             Question.SingleChoice(
-                question = "What is the capital of France?",
-                options = listOf("Berlin", "Madrid", "Paris", "Rome"),
+                text = context.getString(R.string.question_two),
+                options = context.resources.getStringArray(R.array.question_two_options).toList(),
             ),
 
             Question.MultipleChoice(
-                question = "Select prime numbers",
-                options = listOf("2", "4", "5", "9"),
+                text = context.getString(R.string.question_three),
+                options = context.resources.getStringArray(R.array.question_three_options).toList(),
             ),
 
             Question.TextInput(
-                question = "What is the name of your pet?",
-                hint = "Name"
+                text = context.getString(R.string.question_four),
+                hint = context.getString(R.string.answer)
             )
         )
-    }
-
-    private fun string(@StringRes id: Int): String {
-        return context.getString(id)
     }
 }

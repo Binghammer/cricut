@@ -10,14 +10,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,11 +27,9 @@ import com.chadbingham.cricutquiz.util.PreviewQuizState
 fun TextInputQuestion(
     modifier: Modifier = Modifier,
     question: Question.TextInput,
-    userAnswer: UserAnswer.TextInput,
+    answer: UserAnswer.TextInput,
     onAnswerSelected: (UserAnswer) -> Unit,
 ) {
-
-    var answer by rememberSaveable { mutableStateOf(userAnswer) }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -48,12 +42,11 @@ fun TextInputQuestion(
             value = answer.text,
 
             onValueChange = {
-                answer = UserAnswer.TextInput(it)
-                onAnswerSelected(answer)
+                onAnswerSelected(UserAnswer.TextInput(it))
             },
-            colors = TextFieldDefaults.colors(
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                focusedContainerColor = MaterialTheme.colorScheme.surface
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
             ),
             placeholder = {
                 Text(question.hint)
@@ -69,7 +62,7 @@ private fun PreviewTextInput() {
         TextInputQuestion(
             modifier = Modifier,
             question = PreviewQuizState.getUserInputQuestion(),
-            userAnswer = UserAnswer.TextInput()
+            answer = UserAnswer.TextInput()
         ) { }
     }
 

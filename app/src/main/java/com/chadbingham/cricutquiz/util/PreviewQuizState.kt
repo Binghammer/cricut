@@ -17,8 +17,13 @@ object PreviewQuizState {
         getQuestions().forEach {
             questionsAndAnswers[it] = it.defaultAnswer()
         }
+        val index = if (currentIndex > questionsAndAnswers.size) {
+            questionsAndAnswers.size //will be summary page
+        } else {
+            currentIndex
+        }
         return QuizState(
-            questionsAndAnswers = questionsAndAnswers, currentIndex = currentIndex
+            questionsAndAnswers = questionsAndAnswers, currentIndex = index
         )
     }
 
@@ -33,27 +38,27 @@ object PreviewQuizState {
 
     fun getTrueFalseQuestion(): Question.TrueFalse {
         return Question.TrueFalse(
-            question = "Is Kotlin awesome?",
+            text = "Is Kotlin awesome?",
         )
     }
 
     fun getSingleChoiceQuestion(): Question.SingleChoice {
         return Question.SingleChoice(
-            question = "What is the capital of France?",
+            text = "What is the capital of France?",
             options = listOf("Berlin", "Madrid", "Paris", "Rome"),
         )
     }
 
     fun getMultiChoiceQuestion(): Question.MultipleChoice {
         return Question.MultipleChoice(
-            question = "Select prime numbers",
+            text = "Select prime numbers",
             options = listOf("2", "4", "5", "9"),
         )
     }
 
     fun getUserInputQuestion(): Question.TextInput {
         return Question.TextInput(
-            question = "What is the name of your pet?",
+            text = "What is the name of your pet?",
             hint = "Name",
         )
     }

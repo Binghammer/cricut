@@ -23,7 +23,7 @@ import kotlinx.parcelize.Parcelize
 
 class QuizViewModel(
     application: Application,
-    private val savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle = SavedStateHandle(),
 ) : AndroidViewModel(application) {
 
     //normally injected

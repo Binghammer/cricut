@@ -6,6 +6,7 @@
 
 package com.chadbingham.cricutquiz.ui.screen
 
+import MultipleChoiceQuestion
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.fadeIn
@@ -15,13 +16,20 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,7 +41,6 @@ import com.chadbingham.cricutquiz.R
 import com.chadbingham.cricutquiz.data.Question
 import com.chadbingham.cricutquiz.data.QuestionType.TRUE_FALSE
 import com.chadbingham.cricutquiz.data.UserAnswer
-import com.chadbingham.cricutquiz.ui.composable.MultipleChoiceQuestion
 import com.chadbingham.cricutquiz.ui.composable.QuestionTitle
 import com.chadbingham.cricutquiz.ui.composable.SingleChoiceQuestion
 import com.chadbingham.cricutquiz.ui.composable.TextInputQuestion
@@ -51,25 +58,30 @@ fun QuizScreen(
     submitAnswer: (UserAnswer) -> Unit,
     startOver: () -> Unit,
 ) {
-
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(24.dp)
+            .background(MaterialTheme.colorScheme.background),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        LinearProgressIndicator(
+            progress = { quizState.currentIndex / quizState.questionsAndAnswers.size.toFloat() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+        )
 
         Column(
             modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-
             if (quizState.currentIndex != quizState.questionsAndAnswers.size) {
                 QuestionTitle(
-                    modifier = Modifier,
-                    quizState.currentQuestion.question
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    quizState.currentQuestion.text
                 )
             }
 
@@ -83,19 +95,18 @@ fun QuizScreen(
                         slideInVertically { height -> -height } + fadeIn() togetherWith
                                 slideOutVertically { height -> height } + fadeOut()
                     } else if (targetState > initialState) {
-                        slideInHorizontally { height -> height } + fadeIn() togetherWith
-                                slideOutHorizontally { height -> -height } + fadeOut()
+                        slideInHorizontally { width -> width } + fadeIn() togetherWith
+                                slideOutHorizontally { width -> -width } + fadeOut()
                     } else {
-                        slideInHorizontally { height -> -height } + fadeIn() togetherWith
-                                slideOutHorizontally { height -> height } + fadeOut()
+                        slideInHorizontally { width -> -width } + fadeIn() togetherWith
+                                slideOutHorizontally { width -> width } + fadeOut()
                     }.using(
                         SizeTransform(clip = false)
                     )
-
                 }, label = "quiz"
             ) { index ->
                 if (index >= quizState.questionsAndAnswers.size) {
-                    SummaryScreen() {
+                    SummaryScreen {
                         startOver()
                     }
                 } else {
@@ -105,43 +116,43 @@ fun QuizScreen(
                     when (question) {
                         is Question.TrueFalse -> {
                             TrueFalseQuestion(
-                                modifier = Modifier,
-                                userAnswer = answer as UserAnswer.TrueFalse,
+                                modifier = Modifier.padding(vertical = 16.dp),
+                                answer = answer as UserAnswer.TrueFalse,
                                 onAnswerSelected = submitAnswer
                             )
                         }
 
                         is Question.SingleChoice -> {
                             SingleChoiceQuestion(
-                                modifier = Modifier,
+                                modifier = Modifier.padding(vertical = 16.dp),
                                 question = question,
-                                userAnswer = answer as UserAnswer.SingleChoice,
+                                answer = answer as UserAnswer.SingleChoice,
                                 onAnswerSelected = submitAnswer
                             )
                         }
 
                         is Question.MultipleChoice -> {
                             MultipleChoiceQuestion(
-                                modifier = Modifier,
+                                modifier = Modifier.padding(vertical = 16.dp),
                                 question = question,
-                                userAnswer = answer as UserAnswer.MultipleChoice,
+                                answer = answer as UserAnswer.MultipleChoice,
                                 onAnswerSelected = submitAnswer
                             )
                         }
 
                         is Question.TextInput -> {
                             TextInputQuestion(
-                                modifier = Modifier,
+                                modifier = Modifier.padding(vertical = 16.dp),
                                 question = question,
-                                userAnswer = answer as UserAnswer.TextInput,
+                                answer = answer as UserAnswer.TextInput,
                                 onAnswerSelected = submitAnswer
                             )
                         }
                     }
-
                 }
             }
         }
+
         if (quizState.currentIndex != quizState.questionsAndAnswers.size) {
             Row(
                 modifier = Modifier
@@ -151,7 +162,11 @@ fun QuizScreen(
                     Arrangement.SpaceBetween else Arrangement.End
             ) {
                 if (quizState.currentIndex > 0) {
-                    Button(onClick = { onPrevious() }) {
+                    Button(
+                        onClick = { onPrevious() },
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                         Text(stringResource(R.string.all_previous))
                     }
                 }
@@ -167,6 +182,7 @@ fun QuizScreen(
                             stringResource(R.string.all_next)
                         }
                     )
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null)
                 }
             }
         }
