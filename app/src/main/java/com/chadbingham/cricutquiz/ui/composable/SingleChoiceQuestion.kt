@@ -6,6 +6,7 @@
 
 package com.chadbingham.cricutquiz.ui.composable
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,15 +41,16 @@ fun SingleChoiceQuestion(
             Row(
                 modifier = Modifier
                     .fillMaxWidth(0.6f)
-                    .padding(vertical = 4.dp),
+                    .padding(vertical = 4.dp)
+                    .clickable {
+                        onAnswerSelected(UserAnswer.SingleChoice(index))
+                    },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
                 RadioButton(
                     selected = answer.index == index,
-                    onClick = {
-                        onAnswerSelected(UserAnswer.SingleChoice(index))
-                    }
+                    onClick = null
                 )
                 Text(
                     modifier = Modifier

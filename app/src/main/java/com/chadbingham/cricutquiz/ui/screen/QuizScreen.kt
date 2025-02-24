@@ -106,7 +106,7 @@ fun QuizScreen(
                 }, label = "quiz"
             ) { index ->
                 if (index >= quizState.questionsAndAnswers.size) {
-                    SummaryScreen {
+                    SummaryScreen() {
                         startOver()
                     }
                 } else {
